@@ -7,6 +7,7 @@ import (
 
 	"github.com/k0lyaka/pow-antiddos/internal/config"
 	"github.com/k0lyaka/pow-antiddos/internal/proxy"
+	"github.com/k0lyaka/pow-antiddos/internal/redis"
 )
 
 var (
@@ -14,6 +15,9 @@ var (
 )
 
 func main() {
+	redis.InitRedis()
+	defer redis.Client.Close()
+
 	config.LoadConfig()
 	templates = template.Must(template.ParseGlob("templates/*.html"))
 

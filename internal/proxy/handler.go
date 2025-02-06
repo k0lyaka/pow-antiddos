@@ -19,13 +19,13 @@ func (p *ProxyHandlerWithConfig) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	ProxyHandler(w, r, p.Config, p.Templates)
 }
 
-func challengeHandler(w http.ResponseWriter, r *http.Request, ses *session.Session, templates *template.Template) {
-	if r.Method == http.MethodPost {
+func challengeHandler(w http.ResponseWriter, r *http.Request, ses *session.Session, session_id string, templates *template.Template) {
+	if r.Method == http.MethodPost && !ses.Authorized {
 		r.ParseForm()
 		nonce := r.Form.Get("nonce")
 
 		if Validate(ValidationRequest{Nonce: nonce, Prefix: ses.Prefix, Difficulty: 15}) {
-			ses.Authorized = true
+			session.AuthorizeSession(session_id)
 
 			http.Redirect(w, r, r.URL.Path, http.StatusFound)
 			return
@@ -44,7 +44,7 @@ func handleNewSession(w http.ResponseWriter, r *http.Request, templates *templat
 		Path:  "/",
 	})
 
-	challengeHandler(w, r, ses, templates)
+	challengeHandler(w, r, ses, sid, templates)
 }
 
 func ProxyHandler(w http.ResponseWriter, r *http.Request, config config.ConfigModel, templates *template.Template) {
@@ -62,7 +62,7 @@ func ProxyHandler(w http.ResponseWriter, r *http.Request, config config.ConfigMo
 	}
 
 	if !ses.Authorized {
-		challengeHandler(w, r, ses, templates)
+		challengeHandler(w, r, ses, cookie.Value, templates)
 		return
 	}
 
