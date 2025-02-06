@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Proof of Work Challenge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="/static/bundle.js"></script>
+
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="info">
+        <h2>Проверяем, человек ли вы. Это может занять несколько секунд.</h2>
+        <p>Сначала необходимо проверить безопасность вашего подключения.</p>
+
+        <div class="loader"></div>
+
+        <p class="hidden" id="sending">Почти готово...</p>
+      </div>
+
+      <div>
+        <hr />
+        <p class="text-center">Ray ID: {{.Prefix}}</p>
+      </div>
+    </div>
+
+    <script>
+      const prefix = "{{.Prefix}}";
+      const difficulty = Number("{{.Difficulty}}");
+
+      const sendingEl = document.getElementById("sending");
+
+      window.onload = async () => {
+        const nonce = await window.Solver(prefix, difficulty);
+        sendingEl.classList.remove("hidden");
+
+        setTimeout(() => {
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = window.location.href;
+
+          const nonceInput = document.createElement("input");
+          nonceInput.type = "hidden";
+          nonceInput.name = "nonce";
+          nonceInput.value = nonce;
+
+          form.appendChild(nonceInput);
+          document.body.appendChild(form);
+          form.submit();
+        }, 2000);
+      };
+    </script>
+  </body>
+</html>
