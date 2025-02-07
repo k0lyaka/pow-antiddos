@@ -1,0 +1,11 @@
+.github/
+scripts/
+node_modules/
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+.env
+assets/bundle.js
