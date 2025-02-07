@@ -14,8 +14,7 @@ type ConfigModel struct {
 	SessionTTL int
 	Difficulty int
 
-	RedisHost string
-	RedisPort int
+	RedisUrl string
 
 	RateLimitEnabled bool
 	RateLimit        int
@@ -66,8 +65,7 @@ func LoadConfig() {
 		SessionTTL: getEnvInt("SESSION_TTL", 3600),
 		Difficulty: getEnvInt("DIFFICULTY", 16),
 
-		RedisHost: getEnvString("REDIS_HOST", "127.0.0.1"),
-		RedisPort: getEnvInt("REDIS_PORT", 6379),
+		RedisUrl: getEnvString("REDIS_URL", "redis://127.0.0.1:6379/0"),
 
 		RateLimitEnabled: getEnvBool("RATE_LIMIT_ENABLED", false),
 		RateLimit:        getEnvInt("RATE_LIMIT", 10),

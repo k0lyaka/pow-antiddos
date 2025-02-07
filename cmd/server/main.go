@@ -15,10 +15,11 @@ var (
 )
 
 func main() {
+	config.LoadConfig()
+
 	redis.InitRedis()
 	defer redis.Client.Close()
 
-	config.LoadConfig()
 	templates = template.Must(template.ParseGlob("templates/*.html"))
 
 	fs := http.FileServer(http.Dir("assets"))

@@ -1,0 +1,41 @@
+services:
+  demo-backend:
+    image: strm/helloworld-http
+    hostname: demo-backend
+    restart: unless-stopped
+
+  proxy:
+    image: pow-ddos-mitigation:latest
+    restart: unless-stopped
+    build:
+      context: .
+
+    ports:
+      - 10337:8080
+
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      LISTEN_ADDR: :${PUBLIC_PORT:-8080}
+      BACKEND_URL: http://demo-backend:80
+
+      SESSION_TTL: ${SESSION_TTL:-60}
+      DIFFICULTY: ${DIFFICULTY:-16}
+
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-false}
+      RATE_LIMIT: ${RATE_LIMIT:-10}
+
+  redis:
+    image: redis:7.4.1-alpine
+    restart: unless-stopped
+
+    volumes:
+      - redis-data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 8
+
+volumes:
+  redis-data:

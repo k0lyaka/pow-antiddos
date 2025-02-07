@@ -97,9 +97,7 @@ func ProxyHandler(w http.ResponseWriter, r *http.Request, config config.ConfigMo
 		}
 	}
 
-	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-		Scheme: "http",
-		Host:   config.BackendURL,
-	})
+	backendURL, _ := url.Parse(config.BackendURL)
+	proxy := httputil.NewSingleHostReverseProxy(backendURL)
 	proxy.ServeHTTP(w, r)
 }
