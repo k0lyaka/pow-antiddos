@@ -1,14 +1,19 @@
 package proxy
 
 import (
+	"context"
 	"html/template"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"strconv"
 
+	"github.com/go-redis/redis_rate/v10"
 	"github.com/k0lyaka/pow-antiddos/internal/config"
+	"github.com/k0lyaka/pow-antiddos/internal/redis"
 	"github.com/k0lyaka/pow-antiddos/internal/session"
+	"github.com/k0lyaka/pow-antiddos/internal/utils"
 )
 
 type ProxyHandlerWithConfig struct {
@@ -65,6 +70,31 @@ func ProxyHandler(w http.ResponseWriter, r *http.Request, config config.ConfigMo
 	if !ses.Authorized {
 		challengeHandler(w, r, ses, cookie.Value, templates)
 		return
+	}
+
+	// apply rate limiter
+	ip, err := utils.ExtractIP(r)
+
+	if err != nil {
+		w.Write([]byte("500: Internal Server Error"))
+		return
+	}
+
+	if config.RateLimitEnabled {
+		ctx := context.Background()
+		res, err := redis.Limiter.Allow(ctx, "rate-limiter:"+ip, redis_rate.PerSecond(config.RateLimit))
+
+		log.Println(res)
+
+		if err != nil {
+			w.Write([]byte("500: Internal Server Error"))
+			return
+		}
+
+		if res.Remaining == 0 {
+			templates.ExecuteTemplate(w, "409.html", nil)
+			return
+		}
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(&url.URL{

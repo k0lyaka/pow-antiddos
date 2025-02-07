@@ -9,51 +9,67 @@ import (
 )
 
 type ConfigModel struct {
-	ListenAddr string `env:"LISTEN_ADDR"`
-	BackendURL string `env:"BACKEND_URL"`
-	SessionTTL int    `env:"SESSION_TTL"`
-	Difficulty int    `env:"DIFFICULTY"`
+	ListenAddr string
+	BackendURL string
+	SessionTTL int
+	Difficulty int
 
-	RedisHost string `env:"REDIS_HOST"`
-	RedisPort int    `env:"REDIS_PORT"`
+	RedisHost string
+	RedisPort int
+
+	RateLimitEnabled bool
+	RateLimit        int
 }
 
 var Config ConfigModel
 
+func getEnvString(key, fallback string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return fallback
+	}
+	return value
+}
+
+func getEnvInt(key string, fallback int) int {
+	valueStr := os.Getenv(key)
+	if valueStr == "" {
+		return fallback
+	}
+	value, err := strconv.Atoi(valueStr)
+	if err != nil {
+		log.Printf("Invalid value for %s, using default: %v\n", key, fallback)
+		return fallback
+	}
+	return value
+}
+
+func getEnvBool(key string, fallback bool) bool {
+	valueStr := os.Getenv(key)
+	if valueStr == "" {
+		return fallback
+	}
+	value := valueStr == "true"
+	return value
+}
+
 func LoadConfig() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println(".env probably not found, using env")
 	}
 
-	redis_host := os.Getenv("REDIS_HOST")
-	if len(redis_host) == 0 {
-		redis_host = "127.0.0.1"
-	}
-
-	redis_port := os.Getenv("REDIS_PORT")
-	if len(redis_port) == 0 {
-		redis_port = "6379"
-	}
-	redis_port_parsed, err := strconv.Atoi(redis_port)
-
-	difficulty := os.Getenv("DIFFICULTY")
-	if len(difficulty) == 0 {
-		difficulty = "16"
-	}
-	difficulty_parsed, _ := strconv.Atoi(difficulty)
-
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	sessionTTL, _ := strconv.Atoi(os.Getenv("SESSION_TTL"))
 	Config = ConfigModel{
-		ListenAddr: os.Getenv("LISTEN_ADDR"),
-		BackendURL: os.Getenv("BACKEND_URL"),
-		SessionTTL: sessionTTL,
-		RedisHost:  redis_host,
-		RedisPort:  redis_port_parsed,
-		Difficulty: difficulty_parsed,
+		ListenAddr: getEnvString("LISTEN_ADDR", ":8080"),
+		BackendURL: getEnvString("BACKEND_URL", "http://localhost:3000"),
+
+		SessionTTL: getEnvInt("SESSION_TTL", 3600),
+		Difficulty: getEnvInt("DIFFICULTY", 16),
+
+		RedisHost: getEnvString("REDIS_HOST", "127.0.0.1"),
+		RedisPort: getEnvInt("REDIS_PORT", 6379),
+
+		RateLimitEnabled: getEnvBool("RATE_LIMIT_ENABLED", false),
+		RateLimit:        getEnvInt("RATE_LIMIT", 10),
 	}
 }
