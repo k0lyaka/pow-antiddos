@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strconv"
 
 	"github.com/k0lyaka/pow-antiddos/internal/config"
 	"github.com/k0lyaka/pow-antiddos/internal/session"
@@ -24,7 +25,7 @@ func challengeHandler(w http.ResponseWriter, r *http.Request, ses *session.Sessi
 		r.ParseForm()
 		nonce := r.Form.Get("nonce")
 
-		if Validate(ValidationRequest{Nonce: nonce, Prefix: ses.Prefix, Difficulty: 15}) {
+		if Validate(ValidationRequest{Nonce: nonce, Prefix: ses.Prefix, Difficulty: config.Config.Difficulty}) {
 			session.AuthorizeSession(session_id)
 
 			http.Redirect(w, r, r.URL.Path, http.StatusFound)
@@ -32,7 +33,7 @@ func challengeHandler(w http.ResponseWriter, r *http.Request, ses *session.Sessi
 		}
 	}
 
-	templates.ExecuteTemplate(w, "challenge.html", map[string]string{"Prefix": ses.Prefix, "Difficulty": "15"})
+	templates.ExecuteTemplate(w, "challenge.html", map[string]string{"Prefix": ses.Prefix, "Difficulty": strconv.Itoa(config.Config.Difficulty)})
 }
 
 func handleNewSession(w http.ResponseWriter, r *http.Request, templates *template.Template) {

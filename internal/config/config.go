@@ -12,6 +12,7 @@ type ConfigModel struct {
 	ListenAddr string `env:"LISTEN_ADDR"`
 	BackendURL string `env:"BACKEND_URL"`
 	SessionTTL int    `env:"SESSION_TTL"`
+	Difficulty int    `env:"DIFFICULTY"`
 
 	RedisHost string `env:"REDIS_HOST"`
 	RedisPort int    `env:"REDIS_PORT"`
@@ -36,6 +37,12 @@ func LoadConfig() {
 	}
 	redis_port_parsed, err := strconv.Atoi(redis_port)
 
+	difficulty := os.Getenv("DIFFICULTY")
+	if len(difficulty) == 0 {
+		difficulty = "16"
+	}
+	difficulty_parsed, _ := strconv.Atoi(difficulty)
+
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -47,5 +54,6 @@ func LoadConfig() {
 		SessionTTL: sessionTTL,
 		RedisHost:  redis_host,
 		RedisPort:  redis_port_parsed,
+		Difficulty: difficulty_parsed,
 	}
 }
