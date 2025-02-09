@@ -15,9 +15,10 @@
         <h2>Проверяем, человек ли вы. Это может занять несколько секунд.</h2>
         <p>Сначала необходимо проверить безопасность вашего подключения.</p>
 
-        <div class="loader"></div>
-
-        <p class="hidden" id="sending">Почти готово...</p>
+        <div class="statuses">
+          <p><span id="calc-emoji">⏳</span> Вычисляем хэш</p>
+          <p class="hidden" id="send">⏳ Отправляем на сервер</p>
+        </div>
       </div>
 
       <div>
@@ -30,11 +31,13 @@
       const prefix = "{{.Prefix}}";
       const difficulty = Number("{{.Difficulty}}");
 
-      const sendingEl = document.getElementById("sending");
+      const calcEmoji = document.getElementById("calc-emoji");
+      const send = document.getElementById("send");
 
       window.onload = async () => {
         const nonce = await window.Solver(prefix, difficulty);
-        sendingEl.classList.remove("hidden");
+        calcEmoji.innerHTML = "✅";
+        send.classList.remove("hidden");
 
         setTimeout(() => {
           const form = document.createElement("form");

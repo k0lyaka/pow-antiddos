@@ -3,7 +3,6 @@ package proxy
 import (
 	"context"
 	"html/template"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -83,8 +82,6 @@ func ProxyHandler(w http.ResponseWriter, r *http.Request, config config.ConfigMo
 	if config.RateLimitEnabled {
 		ctx := context.Background()
 		res, err := redis.Limiter.Allow(ctx, "rate-limiter:"+ip, redis_rate.PerSecond(config.RateLimit))
-
-		log.Println(res)
 
 		if err != nil {
 			w.Write([]byte("500: Internal Server Error"))

@@ -25,19 +25,28 @@ const check = (hash, difficulty) => {
   return (hash[offset] & mask) === 0;
 };
 
+const bruteHash = (prefix, difficulty) => {
+  return new Promise((resolve, reject) => {
+    const nonce = Buffer.alloc(16);
+
+    while (true) {
+      generateNonce(nonce);
+
+      const hash = createHash("sha256")
+        .update(prefix, "utf-8")
+        .update(nonce)
+        .digest();
+
+      if (check(hash, difficulty)) {
+        resolve(nonce.toString("hex"));
+        break;
+      }
+    }
+  });
+};
+
 const solver = async (prefix, difficulty) => {
-  const nonce = Buffer.alloc(16);
-
-  while (true) {
-    generateNonce(nonce);
-
-    const hash = createHash("sha256")
-      .update(prefix, "utf-8")
-      .update(nonce)
-      .digest();
-
-    if (check(hash, difficulty)) return nonce.toString("hex");
-  }
+  return await bruteHash(prefix, difficulty);
 };
 
 module.exports = solver;
