@@ -23,7 +23,7 @@
 
       <div>
         <hr />
-        <p class="text-center">Ray ID: {{.Prefix}}</p>
+        <p class="text-center">Ray ID: {{.PrefixShort}}</p>
       </div>
     </div>
 
@@ -34,7 +34,7 @@
       const calcEmoji = document.getElementById("calc-emoji");
       const send = document.getElementById("send");
 
-      window.onload = async () => {
+      window.onload = setTimeout(async () => {
         const nonce = await window.Solver(prefix, difficulty);
         calcEmoji.innerHTML = "✅";
         send.classList.remove("hidden");
@@ -53,7 +53,7 @@
           document.body.appendChild(form);
           form.submit();
         }, 2000);
-      };
+      }, 1500);
     </script>
   </body>
 </html>

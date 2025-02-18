@@ -37,7 +37,7 @@ func challengeHandler(w http.ResponseWriter, r *http.Request, ses *session.Sessi
 		}
 	}
 
-	templates.ExecuteTemplate(w, "challenge.html", map[string]string{"Prefix": ses.Prefix, "Difficulty": strconv.Itoa(config.Config.Difficulty)})
+	templates.ExecuteTemplate(w, "challenge.html", map[string]string{"Prefix": ses.Prefix, "Difficulty": strconv.Itoa(config.Config.Difficulty), "PrefixShort": ses.Prefix[:16]})
 }
 
 func handleNewSession(w http.ResponseWriter, r *http.Request, templates *template.Template) {
