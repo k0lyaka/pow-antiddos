@@ -15,6 +15,8 @@ import (
 	"github.com/k0lyaka/pow-antiddos/internal/utils"
 )
 
+const COOKIE_NAME = "__pow_session_id";
+
 type ProxyHandlerWithConfig struct {
 	Config    config.ConfigModel
 	Templates *template.Template
@@ -49,7 +51,7 @@ func handleNewSession(w http.ResponseWriter, r *http.Request, templates *templat
 	sid, ses := session.NewSession()
 
 	http.SetCookie(w, &http.Cookie{
-		Name:  "__pow_session_id",
+		Name:  COOKIE_NAME,
 		Value: sid,
 		Path:  "/",
 	})
@@ -58,7 +60,7 @@ func handleNewSession(w http.ResponseWriter, r *http.Request, templates *templat
 }
 
 func ProxyHandler(w http.ResponseWriter, r *http.Request, config config.ConfigModel, templates *template.Template) {
-	cookie, err := r.Cookie("__pow_session_id")
+	cookie, err := r.Cookie(COOKIE_NAME)
 
 	if err != nil {
 		handleNewSession(w, r, templates)
