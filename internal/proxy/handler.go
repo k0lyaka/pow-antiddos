@@ -32,7 +32,12 @@ func challengeHandler(w http.ResponseWriter, r *http.Request, ses *session.Sessi
 		if Validate(ValidationRequest{Nonce: nonce, Prefix: ses.Prefix, Difficulty: config.Config.Difficulty}) {
 			session.AuthorizeSession(session_id)
 
-			http.Redirect(w, r, r.URL.Path, http.StatusFound)
+			redirectUrl := &url.URL{
+				Path:     r.URL.Path,
+				RawQuery: r.URL.RawQuery,
+			}
+
+			http.Redirect(w, r, redirectUrl.String(), http.StatusFound)
 			return
 		}
 	}

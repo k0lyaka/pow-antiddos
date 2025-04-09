@@ -45,6 +45,7 @@
           form.action = window.location.href;
 
           const nonceInput = document.createElement("input");
+          nonceInput.action = window.location.href;
           nonceInput.type = "hidden";
           nonceInput.name = "nonce";
           nonceInput.value = nonce;
