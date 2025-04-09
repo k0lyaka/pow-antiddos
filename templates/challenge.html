@@ -34,27 +34,28 @@
       const calcEmoji = document.getElementById("calc-emoji");
       const send = document.getElementById("send");
 
-      window.onload = setTimeout(async () => {
-        const nonce = await window.Solver(prefix, difficulty);
-        calcEmoji.innerHTML = "✅";
-        send.classList.remove("hidden");
+      window.onload = () =>
+        setTimeout(async () => {
+          const nonce = await window.Solver(prefix, difficulty);
+          calcEmoji.innerHTML = "✅";
+          send.classList.remove("hidden");
 
-        setTimeout(() => {
-          const form = document.createElement("form");
-          form.method = "POST";
-          form.action = window.location.href;
+          setTimeout(() => {
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = window.location.href;
 
-          const nonceInput = document.createElement("input");
-          nonceInput.action = window.location.href;
-          nonceInput.type = "hidden";
-          nonceInput.name = "nonce";
-          nonceInput.value = nonce;
+            const nonceInput = document.createElement("input");
+            nonceInput.action = window.location.href;
+            nonceInput.type = "hidden";
+            nonceInput.name = "nonce";
+            nonceInput.value = nonce;
 
-          form.appendChild(nonceInput);
-          document.body.appendChild(form);
-          form.submit();
-        }, 2000);
-      }, 1500);
+            form.appendChild(nonceInput);
+            document.body.appendChild(form);
+            form.submit();
+          }, 2000);
+        }, 1500);
     </script>
   </body>
 </html>
